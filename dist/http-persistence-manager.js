@@ -140,4 +140,4 @@ var HttpPersistenceManager = (function () {
     return HttpPersistenceManager;
 }());
 exports.HttpPersistenceManager = HttpPersistenceManager;
-//# sourceMappingURL=persistence-manager-http.js.map
+//# sourceMappingURL=http-persistence-manager.js.map

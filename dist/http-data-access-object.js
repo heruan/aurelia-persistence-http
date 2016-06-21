@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var aurelia_dependency_injection_1 = require("aurelia-dependency-injection");
-var persistence_manager_http_1 = require("./persistence-manager-http");
+var http_persistence_manager_1 = require("./http-persistence-manager");
 var aurelia_persistence_1 = require("aurelia-persistence");
 var HttpDataAccessObject = (function () {
     function HttpDataAccessObject(persistenceManager) {
@@ -45,9 +45,9 @@ var HttpDataAccessObject = (function () {
     };
     HttpDataAccessObject = __decorate([
         aurelia_dependency_injection_1.autoinject, 
-        __metadata('design:paramtypes', [persistence_manager_http_1.HttpPersistenceManager])
+        __metadata('design:paramtypes', [http_persistence_manager_1.HttpPersistenceManager])
     ], HttpDataAccessObject);
     return HttpDataAccessObject;
 }());
 exports.HttpDataAccessObject = HttpDataAccessObject;
-//# sourceMappingURL=data-access-object-http.js.map
+//# sourceMappingURL=http-data-access-object.js.map

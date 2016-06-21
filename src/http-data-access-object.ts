@@ -1,6 +1,6 @@
 import {autoinject} from "aurelia-dependency-injection";
 import {CancelablePromise} from "aurelia-utils";
-import {HttpPersistenceManager} from "./persistence-manager-http";
+import {HttpPersistenceManager} from "./http-persistence-manager";
 import {DataAccessObject, FilterQuery, Query, Sorting} from "aurelia-persistence";
 
 @autoinject

@@ -1,5 +1,5 @@
 import { CancelablePromise } from "aurelia-utils";
-import { HttpPersistenceManager } from "./persistence-manager-http";
+import { HttpPersistenceManager } from "./http-persistence-manager";
 import { DataAccessObject, Query, Sorting } from "aurelia-persistence";
 export declare abstract class HttpDataAccessObject<E extends Object> implements DataAccessObject<E> {
     protected persistenceManager: HttpPersistenceManager;
