@@ -1,0 +1,32 @@
+import { PersistenceManager, Query, Sorting } from "aurelia-persistence";
+import { HttpClient } from "aurelia-http-client";
+import { LinkHeaderParser } from "aurelia-http-utils";
+import { CancelablePromise } from "aurelia-utils";
+export declare class HttpPersistenceManager implements PersistenceManager {
+    protected httpClient: HttpClient;
+    protected linkHeaderParser: LinkHeaderParser;
+    protected relations: Map<new () => Object, Map<string, string>>;
+    protected filterHeaderName: string;
+    protected limitHeaderName: string;
+    protected skipHeaderName: string;
+    protected sortingHeaderName: string;
+    protected propertyFilterHeaderName: string;
+    protected propertyFilterSeparator: string;
+    protected collectionRelation: string;
+    protected entityRelation: string;
+    protected countRelation: string;
+    protected identityProperty: string;
+    constructor(httpClient: HttpClient);
+    setCollectionRelation(relation: string): void;
+    setEntityRelation(relation: string): void;
+    setCountRelation(relation: string): void;
+    setIdentityProperty(property: string): void;
+    identify<E extends Object>(entity: E): string;
+    addEntityType<E extends Object>(type: new () => E, location: string): Promise<void>;
+    findAll<E extends Object>(type: new () => E, query?: Query, limit?: number, skip?: number, sorting?: Sorting, properties?: string[]): CancelablePromise<E[]>;
+    findOne<E extends Object>(type: new () => E, query?: Query, skip?: number, sorting?: Sorting, properties?: string[]): CancelablePromise<E>;
+    count<E extends Object>(type: new () => E, query?: Query, limit?: number, skip?: number): CancelablePromise<number>;
+    save<E extends Object, D>(type: new () => E, entity: E, properties?: string[], data?: D): CancelablePromise<E>;
+    delete<E extends Object>(type: new () => E, entity: E): CancelablePromise<void>;
+    protected link<E extends Object>(type: new () => E, relation: string, params?: Object): string;
+}
