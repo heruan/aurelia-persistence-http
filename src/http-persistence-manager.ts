@@ -73,8 +73,8 @@ export class HttpPersistenceManager implements PersistenceManager {
         let url = this.link(type, this.collectionRelation);
         let requestBuilder = this.httpClient.createRequest(url).asGet();
         requestBuilder.withHeader(this.filterHeaderName, JSON.stringify(query))
-        .withHeader(this.limitHeaderName, JSON.stringify(limit))
-        .withHeader(this.skipHeaderName, JSON.stringify(skip))
+        .withHeader(this.limitHeaderName, `${limit}`)
+        .withHeader(this.skipHeaderName, `${skip}`)
         .withHeader(this.sortingHeaderName, JSON.stringify(sorting));
         if (Array.isArray(properties)) {
             requestBuilder.withHeader(this.propertyFilterHeaderName, properties.join(this.propertyFilterSeparator));
