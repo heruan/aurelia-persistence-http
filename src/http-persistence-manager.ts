@@ -69,22 +69,23 @@ export class HttpPersistenceManager implements PersistenceManager {
         });
     }
 
-    public findAll<E extends Object>(type: new() => E, query: Query = new FilterQuery(), limit: number = 0, skip: number = 0, sorting: Sorting = new Sorting(), properties: string[] = []): CancelablePromise<E[]> {
+    public findAll<E extends Object>(type: new() => E, query: Query = new FilterQuery(), limit: number = 0, skip: number = 0, sorting: Sorting = new Sorting(), properties?: string[]): CancelablePromise<E[]> {
         let url = this.link(type, this.collectionRelation);
-        let request = <CancelablePromise<HttpResponseMessage>> this.httpClient.createRequest(url)
-        .asGet()
-        .withHeader(this.filterHeaderName, JSON.stringify(query))
+        let requestBuilder = this.httpClient.createRequest(url).asGet();
+        requestBuilder.withHeader(this.filterHeaderName, JSON.stringify(query))
         .withHeader(this.limitHeaderName, JSON.stringify(limit))
         .withHeader(this.skipHeaderName, JSON.stringify(skip))
-        .withHeader(this.sortingHeaderName, JSON.stringify(sorting))
-        .withHeader(this.propertyFilterHeaderName, properties.join(this.propertyFilterSeparator))
-        .send();
+        .withHeader(this.sortingHeaderName, JSON.stringify(sorting));
+        if (Array.isArray(properties)) {
+            requestBuilder.withHeader(this.propertyFilterHeaderName, properties.join(this.propertyFilterSeparator));
+        }
+        let request = <CancelablePromise<HttpResponseMessage>> requestBuilder.send();
         let promise = <CancelablePromise<E[]>> request.then(success => <E[]> success.content);
         promise.cancel = request.cancel;
         return promise;
     }
 
-    public findOne<E extends Object>(type: new() => E, query: Query = new FilterQuery(), skip: number = 0, sorting: Sorting = new Sorting(), properties: string[] = []): CancelablePromise<E> {
+    public findOne<E extends Object>(type: new() => E, query: Query = new FilterQuery(), skip: number = 0, sorting: Sorting = new Sorting(), properties?: string[]): CancelablePromise<E> {
         let entities = <CancelablePromise<E[]>> this.findAll(type, query, 1, skip, sorting, properties);
         let promise = <CancelablePromise<E>> entities.then(entities => entities.length > 0 ? entities.shift() : null);
         promise.cancel = entities.cancel;
@@ -104,7 +105,7 @@ export class HttpPersistenceManager implements PersistenceManager {
         return promise;
     }
 
-    public save<E extends Object, D>(type: new() => E, entity: E, properties: string[] = [], data?: D): CancelablePromise<E> {
+    public save<E extends Object, D>(type: new() => E, entity: E, data?: D): CancelablePromise<E> {
         let request: CancelablePromise<HttpResponseMessage>;
         let location: Promise<string>;
         let url = this.link(type, this.entityRelation, entity);
@@ -121,7 +122,7 @@ export class HttpPersistenceManager implements PersistenceManager {
             request = <CancelablePromise<HttpResponseMessage>> this.httpClient.createRequest(url).asPut().withContent(entity).send();
             location = request.then(success => url);
         }
-        let retrieve = location.then(url => this.httpClient.createRequest(url).asGet().withHeader(this.propertyFilterHeaderName, properties.join(this.propertyFilterSeparator)).send());
+        let retrieve = location.then(url => this.httpClient.createRequest(url).asGet().send());
         let promise = <CancelablePromise<E>> retrieve.then(success => <E> success.content);
         promise.cancel = request.cancel;
         return promise;

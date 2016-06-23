@@ -58,16 +58,16 @@ var HttpPersistenceManager = (function () {
         if (limit === void 0) { limit = 0; }
         if (skip === void 0) { skip = 0; }
         if (sorting === void 0) { sorting = new aurelia_persistence_1.Sorting(); }
-        if (properties === void 0) { properties = []; }
         var url = this.link(type, this.collectionRelation);
-        var request = this.httpClient.createRequest(url)
-            .asGet()
-            .withHeader(this.filterHeaderName, JSON.stringify(query))
+        var requestBuilder = this.httpClient.createRequest(url).asGet();
+        requestBuilder.withHeader(this.filterHeaderName, JSON.stringify(query))
             .withHeader(this.limitHeaderName, JSON.stringify(limit))
             .withHeader(this.skipHeaderName, JSON.stringify(skip))
-            .withHeader(this.sortingHeaderName, JSON.stringify(sorting))
-            .withHeader(this.propertyFilterHeaderName, properties.join(this.propertyFilterSeparator))
-            .send();
+            .withHeader(this.sortingHeaderName, JSON.stringify(sorting));
+        if (Array.isArray(properties)) {
+            requestBuilder.withHeader(this.propertyFilterHeaderName, properties.join(this.propertyFilterSeparator));
+        }
+        var request = requestBuilder.send();
         var promise = request.then(function (success) { return success.content; });
         promise.cancel = request.cancel;
         return promise;
@@ -76,7 +76,6 @@ var HttpPersistenceManager = (function () {
         if (query === void 0) { query = new aurelia_persistence_1.FilterQuery(); }
         if (skip === void 0) { skip = 0; }
         if (sorting === void 0) { sorting = new aurelia_persistence_1.Sorting(); }
-        if (properties === void 0) { properties = []; }
         var entities = this.findAll(type, query, 1, skip, sorting, properties);
         var promise = entities.then(function (entities) { return entities.length > 0 ? entities.shift() : null; });
         promise.cancel = entities.cancel;
@@ -97,9 +96,8 @@ var HttpPersistenceManager = (function () {
         promise.cancel = request.cancel;
         return promise;
     };
-    HttpPersistenceManager.prototype.save = function (type, entity, properties, data) {
+    HttpPersistenceManager.prototype.save = function (type, entity, data) {
         var _this = this;
-        if (properties === void 0) { properties = []; }
         var request;
         var location;
         var url = this.link(type, this.entityRelation, entity);
@@ -118,7 +116,7 @@ var HttpPersistenceManager = (function () {
             request = this.httpClient.createRequest(url_3).asPut().withContent(entity).send();
             location = request.then(function (success) { return url_3; });
         }
-        var retrieve = location.then(function (url) { return _this.httpClient.createRequest(url).asGet().withHeader(_this.propertyFilterHeaderName, properties.join(_this.propertyFilterSeparator)).send(); });
+        var retrieve = location.then(function (url) { return _this.httpClient.createRequest(url).asGet().send(); });
         var promise = retrieve.then(function (success) { return success.content; });
         promise.cancel = request.cancel;
         return promise;

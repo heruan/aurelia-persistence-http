@@ -12,11 +12,11 @@ export abstract class HttpDataAccessObject<E extends Object> implements DataAcce
         this.persistenceManager = persistenceManager;
     }
 
-    public findAll(query: Query = new FilterQuery(), limit: number = 0, skip: number = 0, sorting: Sorting = new Sorting(), properties: string[] = []): CancelablePromise<E[]> {
+    public findAll(query: Query = new FilterQuery(), limit: number = 0, skip: number = 0, sorting: Sorting = new Sorting(), properties?: string[]): CancelablePromise<E[]> {
         return this.persistenceManager.findAll<E>(this.getEntityType(), query, limit, skip, sorting, properties);
     }
 
-    public findOne(query: Query = new FilterQuery(), skip: number = 0, sorting: Sorting = new Sorting(), properties: string[] = []): CancelablePromise<E> {
+    public findOne(query: Query = new FilterQuery(), skip: number = 0, sorting: Sorting = new Sorting(), properties?: string[]): CancelablePromise<E> {
         return this.persistenceManager.findOne<E>(this.getEntityType(), query, skip, sorting, properties);
     }
 
@@ -24,8 +24,8 @@ export abstract class HttpDataAccessObject<E extends Object> implements DataAcce
         return this.persistenceManager.count<E>(this.getEntityType(), query, limit, skip);
     }
 
-    public save<D>(entity: E, properties: string[] = [], data?: D): CancelablePromise<E> {
-        return this.persistenceManager.save<E, D>(this.getEntityType(), entity, properties, data);
+    public save<D>(entity: E, data?: D): CancelablePromise<E> {
+        return this.persistenceManager.save<E, D>(this.getEntityType(), entity, data);
     }
 
     public delete(entity: E): CancelablePromise<void> {

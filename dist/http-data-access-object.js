@@ -20,14 +20,12 @@ var HttpDataAccessObject = (function () {
         if (limit === void 0) { limit = 0; }
         if (skip === void 0) { skip = 0; }
         if (sorting === void 0) { sorting = new aurelia_persistence_1.Sorting(); }
-        if (properties === void 0) { properties = []; }
         return this.persistenceManager.findAll(this.getEntityType(), query, limit, skip, sorting, properties);
     };
     HttpDataAccessObject.prototype.findOne = function (query, skip, sorting, properties) {
         if (query === void 0) { query = new aurelia_persistence_1.FilterQuery(); }
         if (skip === void 0) { skip = 0; }
         if (sorting === void 0) { sorting = new aurelia_persistence_1.Sorting(); }
-        if (properties === void 0) { properties = []; }
         return this.persistenceManager.findOne(this.getEntityType(), query, skip, sorting, properties);
     };
     HttpDataAccessObject.prototype.count = function (query, limit, skip) {
@@ -36,9 +34,8 @@ var HttpDataAccessObject = (function () {
         if (skip === void 0) { skip = 0; }
         return this.persistenceManager.count(this.getEntityType(), query, limit, skip);
     };
-    HttpDataAccessObject.prototype.save = function (entity, properties, data) {
-        if (properties === void 0) { properties = []; }
-        return this.persistenceManager.save(this.getEntityType(), entity, properties, data);
+    HttpDataAccessObject.prototype.save = function (entity, data) {
+        return this.persistenceManager.save(this.getEntityType(), entity, data);
     };
     HttpDataAccessObject.prototype.delete = function (entity) {
         return this.persistenceManager.delete(this.getEntityType(), entity);
