@@ -96,6 +96,17 @@ var HttpPersistenceManager = (function () {
         promise.cancel = request.cancel;
         return promise;
     };
+    HttpPersistenceManager.prototype.get = function (type, params, properties) {
+        var url = this.link(type, this.entityRelation, params);
+        var requestBuilder = this.httpClient.createRequest(url).asGet();
+        if (properties) {
+            requestBuilder.withHeader(this.propertyFilterHeaderName, properties.join(","));
+        }
+        var request = requestBuilder.send();
+        var promise = request.then(function (success) { return success.content; });
+        promise.cancel = request.cancel;
+        return promise;
+    };
     HttpPersistenceManager.prototype.save = function (type, entity, data) {
         var _this = this;
         var request;
@@ -138,4 +149,3 @@ var HttpPersistenceManager = (function () {
     return HttpPersistenceManager;
 }());
 exports.HttpPersistenceManager = HttpPersistenceManager;
-//# sourceMappingURL=http-persistence-manager.js.map

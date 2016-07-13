@@ -8,8 +8,11 @@ export abstract class HttpDataAccessObject<E extends Object> implements DataAcce
 
     protected persistenceManager: HttpPersistenceManager;
 
-    public constructor(persistenceManager: HttpPersistenceManager) {
+    protected entityType: new() => E;
+
+    public constructor(persistenceManager: HttpPersistenceManager, entityType: new() => E) {
         this.persistenceManager = persistenceManager;
+        this.entityType = entityType;
     }
 
     public findAll(query: Query = new FilterQuery(), limit: number = 0, skip: number = 0, sorting: Sorting = new Sorting(), properties?: string[]): CancelablePromise<E[]> {
@@ -24,6 +27,10 @@ export abstract class HttpDataAccessObject<E extends Object> implements DataAcce
         return this.persistenceManager.count<E>(this.getEntityType(), query, limit, skip);
     }
 
+    public get(params: Object, properties?: string[]): CancelablePromise<E> {
+        return this.persistenceManager.get<E>(this.getEntityType(), params, properties);
+    }
+
     public save<D>(entity: E, data?: D): CancelablePromise<E> {
         return this.persistenceManager.save<E, D>(this.getEntityType(), entity, data);
     }
@@ -32,6 +39,8 @@ export abstract class HttpDataAccessObject<E extends Object> implements DataAcce
         return this.persistenceManager.delete<E>(this.getEntityType(), entity);
     }
 
-    protected abstract getEntityType(): new() => E;
+    protected getEntityType(): new() => E {
+        return this.entityType;
+    }
 
 }

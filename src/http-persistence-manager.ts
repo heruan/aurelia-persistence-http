@@ -105,6 +105,19 @@ export class HttpPersistenceManager implements PersistenceManager {
         return promise;
     }
 
+    public get<E extends Object>(type: new() => E, params: Object, properties?: string[]): CancelablePromise<E> {
+        let url = this.link(type, this.entityRelation, params);
+        let requestBuilder = this.httpClient.createRequest(url).asGet();
+        if (properties) {
+            requestBuilder.withHeader(this.propertyFilterHeaderName, properties.join(","));
+        }
+        let request = <CancelablePromise<HttpResponseMessage>> requestBuilder.send();
+        let promise = <CancelablePromise<E>> request.then(success => <E> success.content);
+        promise.cancel = request.cancel;
+        return promise;
+    }
+
+
     public save<E extends Object, D>(type: new() => E, entity: E, data?: D): CancelablePromise<E> {
         let request: CancelablePromise<HttpResponseMessage>;
         let location: Promise<string>;
