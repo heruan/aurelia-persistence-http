@@ -1,7 +1,7 @@
 import {autoinject} from "aurelia-dependency-injection";
 import {PersistenceManager, Query, FilterQuery, Sorting} from "aurelia-persistence";
 import {HttpClient, HttpResponseMessage} from "aurelia-http-client";
-import {HttpHeaders, LinkHeaderParser} from "aurelia-http-utils";
+import {HttpHeaders, LinkHeaderParser, MediaType} from "aurelia-http-utils";
 import {CancelablePromise} from "aurelia-utils";
 import {JsonPatch} from "aurelia-json";
 import * as UrlTemplate from "url-template";
@@ -128,7 +128,9 @@ export class HttpPersistenceManager implements PersistenceManager {
             location = request.then(success => success.headers.get(HttpHeaders.LOCATION));
         } else if (data instanceof JsonPatch || Array.isArray(data)) {
             let url = this.link(type, this.entityRelation, entity);
-            request = <CancelablePromise<HttpResponseMessage>> this.httpClient.createRequest(url).asPatch().withContent(data).send();
+            request = <CancelablePromise<HttpResponseMessage>> this.httpClient.createRequest(url).asPatch()
+            .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_PATCH)
+            .withContent(data).send();
             location = request.then(success => url);
         } else {
             let url = this.link(type, this.entityRelation, entity);

@@ -119,7 +119,9 @@ var HttpPersistenceManager = (function () {
         }
         else if (data instanceof aurelia_json_1.JsonPatch || Array.isArray(data)) {
             var url_2 = this.link(type, this.entityRelation, entity);
-            request = this.httpClient.createRequest(url_2).asPatch().withContent(data).send();
+            request = this.httpClient.createRequest(url_2).asPatch()
+                .withHeader(aurelia_http_utils_1.HttpHeaders.CONTENT_TYPE, aurelia_http_utils_1.MediaType.APPLICATION_JSON_PATCH)
+                .withContent(data).send();
             location = request.then(function (success) { return url_2; });
         }
         else {
