@@ -63,8 +63,12 @@ export class HttpPersistenceManager implements PersistenceManager {
 
     public addEntityType<E extends Object>(type: new() => E, location: string): Promise<void> {
         return this.httpClient.options(location).then(success => {
-            let linkHeader = success.headers.get(HttpHeaders.LINK);
-            let relations = this.linkHeaderParser.parse(linkHeader.split(","));
+            // let linkHeader = success.headers.get(HttpHeaders.LINK);
+            // let relations = this.linkHeaderParser.parse(linkHeader.split(","));
+            // FIXME should be as above when this gets fixed: https://github.com/aurelia/http-client/issues/128
+            let relations = new Map<string, string>();
+            let links = success.content["links"];
+            Object.keys(links).forEach(rel => relations.set(rel, links[rel]));
             this.relations.set(type, relations);
         });
     }

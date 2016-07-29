@@ -48,8 +48,12 @@ var HttpPersistenceManager = (function () {
     HttpPersistenceManager.prototype.addEntityType = function (type, location) {
         var _this = this;
         return this.httpClient.options(location).then(function (success) {
-            var linkHeader = success.headers.get(aurelia_http_utils_1.HttpHeaders.LINK);
-            var relations = _this.linkHeaderParser.parse(linkHeader.split(","));
+            // let linkHeader = success.headers.get(HttpHeaders.LINK);
+            // let relations = this.linkHeaderParser.parse(linkHeader.split(","));
+            // FIXME should be as above when this gets fixed: https://github.com/aurelia/http-client/issues/128
+            var relations = new Map();
+            var links = success.content["links"];
+            Object.keys(links).forEach(function (rel) { return relations.set(rel, links[rel]); });
             _this.relations.set(type, relations);
         });
     };
