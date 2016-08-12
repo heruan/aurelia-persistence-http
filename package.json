@@ -1,6 +1,6 @@
 {
   "name": "aurelia-persistence-http",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "A plugin for Aurelia based projects.",
   "keywords": [
     "aurelia",
@@ -26,8 +26,8 @@
     "aurelia-framework": "^1.0.1",
     "aurelia-http-client": "^1.0.0",
     "aurelia-http-utils": "^0.2.1",
-    "aurelia-json": "^0.2.2",
-    "aurelia-persistence": "^0.3.4",
+    "aurelia-json": "^0.2.3",
+    "aurelia-persistence": "^0.3.7",
     "aurelia-utils": "^0.2.1",
     "url-template": "^2.0.8"
   },

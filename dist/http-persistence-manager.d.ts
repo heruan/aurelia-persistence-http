@@ -11,11 +11,13 @@ export declare class HttpPersistenceManager implements PersistenceManager {
     protected skipHeaderName: string;
     protected sortingHeaderName: string;
     protected propertyFilterHeaderName: string;
+    protected countTotalHeaderName: string;
+    protected countFilterHeaderName: string;
     protected propertyFilterSeparator: string;
-    protected collectionRelation: string;
-    protected entityRelation: string;
-    protected countRelation: string;
-    protected identityProperty: string;
+    collectionRelation: string;
+    entityRelation: string;
+    countRelation: string;
+    identityProperty: string;
     constructor(httpClient: HttpClient);
     setCollectionRelation(relation: string): void;
     setEntityRelation(relation: string): void;
@@ -23,11 +25,11 @@ export declare class HttpPersistenceManager implements PersistenceManager {
     setIdentityProperty(property: string): void;
     identify<E extends Object>(entity: E): string;
     addEntityType<E extends Object>(type: new () => E, location: string): Promise<void>;
-    findAll<E extends Object>(type: new () => E, query?: Query, limit?: number, skip?: number, sorting?: Sorting, properties?: string[]): CancelablePromise<E[]>;
-    findOne<E extends Object>(type: new () => E, query?: Query, skip?: number, sorting?: Sorting, properties?: string[]): CancelablePromise<E>;
-    count<E extends Object>(type: new () => E, query?: Query, limit?: number, skip?: number): CancelablePromise<number>;
-    get<E extends Object>(type: new () => E, params: Object, properties?: string[]): CancelablePromise<E>;
-    save<E extends Object, D>(type: new () => E, entity: E, data?: D): CancelablePromise<E>;
-    delete<E extends Object>(type: new () => E, entity: E): CancelablePromise<void>;
-    protected link<E extends Object>(type: new () => E, relation: string, params?: Object): string;
+    findAll<E extends Object, R>(type: new () => E, query?: Query, limit?: number, skip?: number, sorting?: Sorting, properties?: string[], relation?: string): CancelablePromise<R[]>;
+    findOne<E extends Object, R>(type: new () => E, query?: Query, skip?: number, sorting?: Sorting, properties?: string[], relation?: string): CancelablePromise<R>;
+    count<E extends Object>(type: new () => E, query?: Query, limit?: number, skip?: number, relation?: string): CancelablePromise<number>;
+    get<E extends Object, R>(type: new () => E, params: Object, properties?: string[], relation?: string): CancelablePromise<R>;
+    save<E extends Object, D, R>(type: new () => E, entity: E, data?: D, relation?: string, relationParams?: Object): CancelablePromise<R>;
+    delete<E extends Object>(type: new () => E, entity: E, relation?: string, relationParams?: Object): CancelablePromise<void>;
+    link<E extends Object>(type: new () => E, relation: string, params?: Object): string;
 }

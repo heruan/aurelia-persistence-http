@@ -21,6 +21,8 @@ var HttpPersistenceManager = (function () {
         this.skipHeaderName = "X-Skip";
         this.sortingHeaderName = "X-Sort";
         this.propertyFilterHeaderName = "X-Property-Filter";
+        this.countTotalHeaderName = "X-Count-Total";
+        this.countFilterHeaderName = "X-Count-Filter";
         this.propertyFilterSeparator = ",";
         this.collectionRelation = "list";
         this.entityRelation = "self";
@@ -57,12 +59,13 @@ var HttpPersistenceManager = (function () {
             _this.relations.set(type, relations);
         });
     };
-    HttpPersistenceManager.prototype.findAll = function (type, query, limit, skip, sorting, properties) {
+    HttpPersistenceManager.prototype.findAll = function (type, query, limit, skip, sorting, properties, relation) {
         if (query === void 0) { query = new aurelia_persistence_1.FilterQuery(); }
         if (limit === void 0) { limit = 0; }
         if (skip === void 0) { skip = 0; }
         if (sorting === void 0) { sorting = new aurelia_persistence_1.Sorting(); }
-        var url = this.link(type, this.collectionRelation);
+        if (relation === void 0) { relation = this.collectionRelation; }
+        var url = this.link(type, relation);
         var requestBuilder = this.httpClient.createRequest(url).asGet();
         requestBuilder.withHeader(this.filterHeaderName, JSON.stringify(query))
             .withHeader(this.limitHeaderName, "" + limit)
@@ -72,24 +75,30 @@ var HttpPersistenceManager = (function () {
             requestBuilder.withHeader(this.propertyFilterHeaderName, properties.join(this.propertyFilterSeparator));
         }
         var request = requestBuilder.send();
-        var promise = request.then(function (success) { return success.content; });
+        var promise = request.then(function (success) {
+            // let countTotal = +success.headers.get(this.countTotalHeaderName);
+            // let countFilter = +success.headers.get(this.countFilterHeaderName);
+            return success.content;
+        });
         promise.cancel = request.cancel;
         return promise;
     };
-    HttpPersistenceManager.prototype.findOne = function (type, query, skip, sorting, properties) {
+    HttpPersistenceManager.prototype.findOne = function (type, query, skip, sorting, properties, relation) {
         if (query === void 0) { query = new aurelia_persistence_1.FilterQuery(); }
         if (skip === void 0) { skip = 0; }
         if (sorting === void 0) { sorting = new aurelia_persistence_1.Sorting(); }
-        var entities = this.findAll(type, query, 1, skip, sorting, properties);
+        if (relation === void 0) { relation = this.collectionRelation; }
+        var entities = this.findAll(type, query, 1, skip, sorting, properties, relation);
         var promise = entities.then(function (entities) { return entities.length > 0 ? entities.shift() : null; });
         promise.cancel = entities.cancel;
         return promise;
     };
-    HttpPersistenceManager.prototype.count = function (type, query, limit, skip) {
+    HttpPersistenceManager.prototype.count = function (type, query, limit, skip, relation) {
         if (query === void 0) { query = new aurelia_persistence_1.FilterQuery(); }
         if (limit === void 0) { limit = 0; }
         if (skip === void 0) { skip = 0; }
-        var url = this.link(type, this.countRelation);
+        if (relation === void 0) { relation = this.countRelation; }
+        var url = this.link(type, relation);
         var request = this.httpClient.createRequest(url)
             .asGet()
             .withHeader(this.filterHeaderName, JSON.stringify(query))
@@ -100,8 +109,9 @@ var HttpPersistenceManager = (function () {
         promise.cancel = request.cancel;
         return promise;
     };
-    HttpPersistenceManager.prototype.get = function (type, params, properties) {
-        var url = this.link(type, this.entityRelation, params);
+    HttpPersistenceManager.prototype.get = function (type, params, properties, relation) {
+        if (relation === void 0) { relation = this.entityRelation; }
+        var url = this.link(type, relation, params);
         var requestBuilder = this.httpClient.createRequest(url).asGet();
         if (properties) {
             requestBuilder.withHeader(this.propertyFilterHeaderName, properties.join(","));
@@ -111,35 +121,34 @@ var HttpPersistenceManager = (function () {
         promise.cancel = request.cancel;
         return promise;
     };
-    HttpPersistenceManager.prototype.save = function (type, entity, data) {
+    HttpPersistenceManager.prototype.save = function (type, entity, data, relation, relationParams) {
         var _this = this;
         var request;
         var location;
-        var url = this.link(type, this.entityRelation, entity);
         if (data instanceof FormData || this.identify(entity) === null) {
-            var url_1 = this.link(type, this.collectionRelation);
-            request = this.httpClient.createRequest(url_1).asPost().withContent(data ? data : entity).send();
-            location = request.then(function (success) { return success.headers.get(aurelia_http_utils_1.HttpHeaders.LOCATION); });
+            var url_1 = this.link(type, relation || this.collectionRelation, relationParams || entity);
+            request = this.httpClient.createRequest(url_1).asPost().withContent(data || entity).send();
+            location = request.then(function (success) { return success.headers.get(aurelia_http_utils_1.HttpHeaders.LOCATION) || url_1; });
         }
         else if (data instanceof aurelia_json_1.JsonPatch || Array.isArray(data)) {
-            var url_2 = this.link(type, this.entityRelation, entity);
+            var url_2 = this.link(type, relation || this.entityRelation, relationParams || entity);
             request = this.httpClient.createRequest(url_2).asPatch()
                 .withHeader(aurelia_http_utils_1.HttpHeaders.CONTENT_TYPE, aurelia_http_utils_1.MediaType.APPLICATION_JSON_PATCH)
                 .withContent(data).send();
             location = request.then(function (success) { return url_2; });
         }
         else {
-            var url_3 = this.link(type, this.entityRelation, entity);
-            request = this.httpClient.createRequest(url_3).asPut().withContent(entity).send();
+            var url_3 = this.link(type, relation || this.entityRelation, relationParams || entity);
+            request = this.httpClient.createRequest(url_3).asPut().withContent(data || entity).send();
             location = request.then(function (success) { return url_3; });
         }
-        var retrieve = location.then(function (url) { return _this.httpClient.createRequest(url).asGet().send(); });
-        var promise = retrieve.then(function (success) { return success.content; });
-        promise.cancel = request.cancel;
-        return promise;
+        var retrieve = location.then(function (url) { return _this.httpClient.createRequest(url).asGet().send(); }).then(function (success) { return success.content; });
+        retrieve.cancel = request.cancel;
+        return retrieve;
     };
-    HttpPersistenceManager.prototype.delete = function (type, entity) {
-        var url = this.link(type, this.entityRelation, entity);
+    HttpPersistenceManager.prototype.delete = function (type, entity, relation, relationParams) {
+        if (relation === void 0) { relation = this.entityRelation; }
+        var url = this.link(type, relation, relationParams || entity);
         var request = this.httpClient.createRequest(url).asDelete().send();
         var promise = request.then(function (success) { return null; });
         promise.cancel = request.cancel;
