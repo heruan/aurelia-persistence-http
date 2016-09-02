@@ -126,23 +126,23 @@ var HttpPersistenceManager = (function () {
         var request;
         var location;
         if (data instanceof FormData || this.identify(entity) === null) {
-            var url_1 = this.link(type, relation || this.collectionRelation, relationParams || entity);
-            request = this.httpClient.createRequest(url_1).asPost().withContent(data || entity).send();
-            location = request.then(function (success) { return success.headers.get(aurelia_http_utils_1.HttpHeaders.LOCATION) || url_1; });
+            var url = this.link(type, relation || this.collectionRelation, relationParams || entity);
+            request = this.httpClient.createRequest(url).asPost().withContent(data || entity).send();
+            location = request.then(function (success) { return success.headers.get(aurelia_http_utils_1.HttpHeaders.LOCATION) || null; });
         }
         else if (data instanceof aurelia_json_1.JsonPatch || Array.isArray(data)) {
-            var url_2 = this.link(type, relation || this.entityRelation, relationParams || entity);
-            request = this.httpClient.createRequest(url_2).asPatch()
+            var url_1 = this.link(type, relation || this.entityRelation, relationParams || entity);
+            request = this.httpClient.createRequest(url_1).asPatch()
                 .withHeader(aurelia_http_utils_1.HttpHeaders.CONTENT_TYPE, aurelia_http_utils_1.MediaType.APPLICATION_JSON_PATCH)
                 .withContent(data).send();
-            location = request.then(function (success) { return url_2; });
+            location = request.then(function (success) { return url_1; });
         }
         else {
-            var url_3 = this.link(type, relation || this.entityRelation, relationParams || entity);
-            request = this.httpClient.createRequest(url_3).asPut().withContent(data || entity).send();
-            location = request.then(function (success) { return url_3; });
+            var url_2 = this.link(type, relation || this.entityRelation, relationParams || entity);
+            request = this.httpClient.createRequest(url_2).asPut().withContent(data || entity).send();
+            location = request.then(function (success) { return url_2; });
         }
-        var retrieve = location.then(function (url) { return _this.httpClient.createRequest(url).asGet().send(); }).then(function (success) { return success.content; });
+        var retrieve = location.then(function (url) { return url ? _this.httpClient.createRequest(url).asGet().send() : null; }).then(function (success) { return success ? success.content : entity; });
         retrieve.cancel = request.cancel;
         return retrieve;
     };

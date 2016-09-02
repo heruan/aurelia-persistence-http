@@ -135,7 +135,7 @@ export class HttpPersistenceManager implements PersistenceManager {
         if (data instanceof FormData || this.identify(entity) === null) {
             let url = this.link(type, relation || this.collectionRelation, relationParams || entity);
             request = <CancelablePromise<HttpResponseMessage>> this.httpClient.createRequest(url).asPost().withContent(data || entity).send();
-            location = request.then(success => success.headers.get(HttpHeaders.LOCATION) || url);
+            location = request.then(success => success.headers.get(HttpHeaders.LOCATION) || null);
         } else if (data instanceof JsonPatch || Array.isArray(data)) {
             let url = this.link(type, relation || this.entityRelation, relationParams || entity);
             request = <CancelablePromise<HttpResponseMessage>> this.httpClient.createRequest(url).asPatch()
@@ -147,7 +147,7 @@ export class HttpPersistenceManager implements PersistenceManager {
             request = <CancelablePromise<HttpResponseMessage>> this.httpClient.createRequest(url).asPut().withContent(data || entity).send();
             location = request.then(success => url);
         }
-        let retrieve = <CancelablePromise<R>> location.then(url => this.httpClient.createRequest(url).asGet().send()).then(success => <R> success.content);
+        let retrieve = <CancelablePromise<R>> location.then(url => url ? this.httpClient.createRequest(url).asGet().send() : null).then(success => success ? <R> success.content : entity);
         retrieve.cancel = request.cancel;
         return retrieve;
     }
