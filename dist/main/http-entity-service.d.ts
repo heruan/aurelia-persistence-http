@@ -8,12 +8,12 @@ export declare abstract class HttpEntityService<E extends Object> implements Ent
     entityRelation: string;
     countRelation: string;
     constructor(persistenceManager: HttpPersistenceManager, entityType: new () => E);
-    findAll(query?: Query, limit?: number, skip?: number, sorting?: Sorting, properties?: string[], relation?: string): CancelablePromise<E[]>;
-    findOne(query?: Query, skip?: number, sorting?: Sorting, properties?: string[], relation?: string): CancelablePromise<E>;
-    count(query?: Query, limit?: number, skip?: number, relation?: string): CancelablePromise<number>;
-    get(params: Object, properties?: string[], relation?: string): CancelablePromise<E>;
-    save<D>(entity: E, data?: D, relation?: string): CancelablePromise<E>;
-    delete(entity: E, relation?: string): CancelablePromise<void>;
+    findAll(query?: Query, limit?: number, skip?: number, sorting?: Sorting, properties?: string[]): CancelablePromise<E[]>;
+    findOne(query?: Query, skip?: number, sorting?: Sorting, properties?: string[]): CancelablePromise<E>;
+    count(query?: Query, limit?: number, skip?: number): CancelablePromise<number>;
+    get(params: Object, properties?: string[]): CancelablePromise<E>;
+    save<D>(entity: E): CancelablePromise<E>;
+    delete(entity: E): CancelablePromise<void>;
     protected getParamsFromEntity(entity: E): Object;
     protected getEntityType(): new () => E;
 }

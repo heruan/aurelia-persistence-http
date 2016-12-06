@@ -1,6 +1,6 @@
 {
   "name": "aurelia-persistence-http",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "A plugin for Aurelia based projects.",
   "keywords": [
     "aurelia",
@@ -16,35 +16,36 @@
     "type": "git",
     "url": "https://github.com/heruan/aurelia-persistence-http.git"
   },
-  "main": "dist/index.js",
-  "typings": "dist/index.d.ts",
+  "main": "dist/main/index.js",
+  "typings": "dist/main/index.d.ts",
   "scripts": {
     "test": "gulp test"
   },
   "dependencies": {
-    "aurelia-dependency-injection": "^1.0.0",
-    "aurelia-framework": "^1.0.2",
-    "aurelia-http-client": "^1.0.0",
+    "aurelia-dependency-injection": "^1.2.0",
+    "aurelia-framework": "^1.0.7",
+    "aurelia-http-client": "^1.0.3",
     "aurelia-http-utils": "^0.2.1",
     "aurelia-json": "^0.2.4",
     "aurelia-persistence": "^0.3.8",
     "aurelia-utils": "^0.2.1",
+    "type-binder": "^0.1.1",
     "url-template": "^2.0.8"
   },
   "devDependencies": {
-    "babel-preset-es2015": "^6.14.0",
-    "babel-register": "^6.14.0",
+    "babel-preset-es2015": "^6.18.0",
+    "babel-register": "^6.18.0",
     "del": "^2.2.2",
     "gulp": "^3.9.1",
-    "gulp-jasmine": "^2.4.1",
+    "gulp-jasmine": "^2.4.2",
     "gulp-sass": "^2.3.2",
-    "gulp-typescript": "^2.13.6",
-    "jasmine": "^2.5.0",
+    "gulp-typescript": "^3.1.3",
+    "gulp-typings": "^2.0.4",
+    "jasmine": "^2.5.2",
     "jasmine-reporters": "^2.2.0",
     "merge2": "^1.0.2",
-    "path-exists": "^3.0.0",
     "run-sequence": "^1.2.2",
-    "typescript": "^2.0.0",
+    "typescript": "^2.1.1",
     "vinyl-paths": "^2.1.0"
   }
 }

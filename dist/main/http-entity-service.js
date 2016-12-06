@@ -18,42 +18,34 @@ var HttpEntityService = (function () {
         this.countRelation = "count";
         this.persistenceManager = persistenceManager;
         this.entityType = entityType;
-        this.collectionRelation = this.persistenceManager.collectionRelation;
-        this.entityRelation = this.persistenceManager.entityRelation;
-        this.countRelation = this.persistenceManager.countRelation;
     }
-    HttpEntityService.prototype.findAll = function (query, limit, skip, sorting, properties, relation) {
+    HttpEntityService.prototype.findAll = function (query, limit, skip, sorting, properties) {
         if (query === void 0) { query = new aurelia_persistence_1.FilterQuery(); }
         if (limit === void 0) { limit = 0; }
         if (skip === void 0) { skip = 0; }
         if (sorting === void 0) { sorting = new aurelia_persistence_1.Sorting(); }
-        if (relation === void 0) { relation = this.collectionRelation; }
-        return this.persistenceManager.findAll(this.getEntityType(), query, limit, skip, sorting, properties, relation);
+        return this.persistenceManager.findAll(this.getEntityType(), query, limit, skip, sorting, properties);
     };
-    HttpEntityService.prototype.findOne = function (query, skip, sorting, properties, relation) {
+    HttpEntityService.prototype.findOne = function (query, skip, sorting, properties) {
         if (query === void 0) { query = new aurelia_persistence_1.FilterQuery(); }
         if (skip === void 0) { skip = 0; }
         if (sorting === void 0) { sorting = new aurelia_persistence_1.Sorting(); }
-        if (relation === void 0) { relation = this.collectionRelation; }
-        return this.persistenceManager.findOne(this.getEntityType(), query, skip, sorting, properties, relation);
+        return this.persistenceManager.findOne(this.getEntityType(), query, skip, sorting, properties);
     };
-    HttpEntityService.prototype.count = function (query, limit, skip, relation) {
+    HttpEntityService.prototype.count = function (query, limit, skip) {
         if (query === void 0) { query = new aurelia_persistence_1.FilterQuery(); }
         if (limit === void 0) { limit = 0; }
         if (skip === void 0) { skip = 0; }
-        if (relation === void 0) { relation = this.countRelation; }
-        return this.persistenceManager.count(this.getEntityType(), query, limit, skip, relation);
+        return this.persistenceManager.count(this.getEntityType(), query, limit, skip);
     };
-    HttpEntityService.prototype.get = function (params, properties, relation) {
-        if (relation === void 0) { relation = this.entityRelation; }
-        return this.persistenceManager.get(this.getEntityType(), params, properties, relation);
+    HttpEntityService.prototype.get = function (params, properties) {
+        return this.persistenceManager.get(this.getEntityType(), params, properties);
     };
-    HttpEntityService.prototype.save = function (entity, data, relation) {
-        return this.persistenceManager.save(this.getEntityType(), entity, data, relation, this.getParamsFromEntity(entity));
+    HttpEntityService.prototype.save = function (entity) {
+        return this.persistenceManager.save(this.getEntityType(), entity);
     };
-    HttpEntityService.prototype.delete = function (entity, relation) {
-        if (relation === void 0) { relation = this.entityRelation; }
-        return this.persistenceManager.delete(this.getEntityType(), entity, relation, this.getParamsFromEntity(entity));
+    HttpEntityService.prototype.delete = function (entity) {
+        return this.persistenceManager.delete(this.getEntityType(), entity);
     };
     HttpEntityService.prototype.getParamsFromEntity = function (entity) {
         return entity;
@@ -61,10 +53,10 @@ var HttpEntityService = (function () {
     HttpEntityService.prototype.getEntityType = function () {
         return this.entityType;
     };
-    HttpEntityService = __decorate([
-        aurelia_dependency_injection_1.autoinject, 
-        __metadata('design:paramtypes', [http_persistence_manager_1.HttpPersistenceManager, Function])
-    ], HttpEntityService);
     return HttpEntityService;
 }());
+HttpEntityService = __decorate([
+    aurelia_dependency_injection_1.autoinject,
+    __metadata("design:paramtypes", [http_persistence_manager_1.HttpPersistenceManager, Function])
+], HttpEntityService);
 exports.HttpEntityService = HttpEntityService;
