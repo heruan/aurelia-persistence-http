@@ -1,7 +1,7 @@
-import { autoinject} from "aurelia-dependency-injection";
-import { CancelablePromise} from "aurelia-utils";
-import { HttpPersistenceManager} from "./http-persistence-manager";
-import { EntityService, FilterQuery, Query, Sorting} from "aurelia-persistence";
+import { autoinject } from "aurelia-dependency-injection";
+import { CancelablePromise } from "aurelia-utils";
+import { HttpPersistenceManager } from "./http-persistence-manager";
+import { EntityService, FilterQuery, Query, Sorting } from "aurelia-persistence";
 
 @autoinject
 export abstract class HttpEntityService<E extends Object> implements EntityService<E> {

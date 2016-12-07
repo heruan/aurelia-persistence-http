@@ -1,2 +1,2 @@
-export { HttpPersistenceManager} from "./http-persistence-manager";
-export { HttpEntityService} from "./http-entity-service";
+export { HttpPersistenceManager } from "./http-persistence-manager";
+export { HttpEntityService } from "./http-entity-service";

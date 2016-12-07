@@ -1,10 +1,10 @@
-import { autoinject} from "aurelia-dependency-injection";
-import { PersistenceManager, Query, FilterQuery, Sorting} from "aurelia-persistence";
-import { RequestBuilder, HttpClient, HttpResponseMessage} from "aurelia-http-client";
-import { HttpHeaders, LinkHeaderParser, ContentType} from "aurelia-http-utils";
-import { CancelablePromise} from "aurelia-utils";
-import { JsonPatch, JsonMultipartRelatedInterceptor} from "aurelia-json";
-import { TypeBinder} from "type-binder";
+import { autoinject } from "aurelia-dependency-injection";
+import { PersistenceManager, Query, FilterQuery, Sorting } from "aurelia-persistence";
+import { RequestBuilder, HttpClient, HttpResponseMessage } from "aurelia-http-client";
+import { HttpHeaders, LinkHeaderParser, ContentType } from "aurelia-http-utils";
+import { CancelablePromise } from "aurelia-utils";
+import { JsonPatch, JsonMultipartRelatedInterceptor } from "aurelia-json";
+import { TypeBinder } from "type-binder";
 import * as UrlTemplate from "url-template";
 
 RequestBuilder.addHelper("asCount", () => (client, processor, message) => {
