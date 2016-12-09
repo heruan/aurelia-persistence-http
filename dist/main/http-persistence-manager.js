@@ -85,6 +85,12 @@ var HttpPersistenceManager = (function () {
         if (relation === void 0) { relation = this.collectionRelation; }
         if (relationParams === void 0) { relationParams = {}; }
         var url = this.link(type, relation, relationParams);
+        return this.httpCount(url, query, limit, skip);
+    };
+    HttpPersistenceManager.prototype.httpCount = function (url, query, limit, skip) {
+        if (query === void 0) { query = new aurelia_persistence_1.FilterQuery(); }
+        if (limit === void 0) { limit = 0; }
+        if (skip === void 0) { skip = 0; }
         var request = this.httpClient.createRequest(url)
             .asCount()
             .withHeader(this.filterHeaderName, JSON.stringify(query))
@@ -96,9 +102,16 @@ var HttpPersistenceManager = (function () {
         return promise;
     };
     HttpPersistenceManager.prototype.get = function (type, params, properties, relation) {
-        var _this = this;
         if (relation === void 0) { relation = this.entityRelation; }
         var url = this.link(type, relation, params);
+        return this.httpGet(url, properties, type);
+    };
+    HttpPersistenceManager.prototype.httpGet = function (url, properties, type) {
+        var _this = this;
+        var generics = [];
+        for (var _i = 3; _i < arguments.length; _i++) {
+            generics[_i - 3] = arguments[_i];
+        }
         var requestBuilder = this.httpClient.createRequest(url).asGet();
         if (properties) {
             requestBuilder.withHeader(this.propertyFilterHeaderName, properties.join(","));
