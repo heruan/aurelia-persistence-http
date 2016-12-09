@@ -104,6 +104,10 @@ export class HttpPersistenceManager implements PersistenceManager {
             relation: string = this.collectionRelation,
             relationParams: Object = { }): CancelablePromise<number> {
         let url = this.link(type, relation, relationParams);
+        return this.httpCount(url, query, limit, skip);
+    }
+
+    public httpCount(url: string, query: Query = new FilterQuery(), limit: number = 0, skip: number = 0): CancelablePromise<number> {
         let request = <CancelablePromise<HttpResponseMessage>> (<any>this.httpClient).createRequest(url)
             .asCount()
             .withHeader(this.filterHeaderName, JSON.stringify(query))
@@ -121,12 +125,16 @@ export class HttpPersistenceManager implements PersistenceManager {
             properties?: string[],
             relation: string = this.entityRelation): CancelablePromise<E> {
         let url = this.link(type, relation, params);
+        return this.httpGet(url, properties, type);
+    }
+
+    public httpGet<T>(url: string, properties: string[], type: new() => T, ...generics: any[]): CancelablePromise<T> {
         let requestBuilder = this.httpClient.createRequest(url).asGet();
         if (properties) {
             requestBuilder.withHeader(this.propertyFilterHeaderName, properties.join(","));
         }
         let request = <CancelablePromise<HttpResponseMessage>> requestBuilder.send();
-        let promise = <CancelablePromise<E>> request.then(success => this.typeBinder.bind(success.content, type));
+        let promise = <CancelablePromise<T>> request.then(success => this.typeBinder.bind(success.content, type));
         promise.cancel = request.cancel;
         return promise;
     }
