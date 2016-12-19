@@ -171,3 +171,5 @@ HttpPersistenceManager = __decorate([
     __metadata("design:paramtypes", [aurelia_http_client_1.HttpClient, type_binder_1.TypeBinder])
 ], HttpPersistenceManager);
 exports.HttpPersistenceManager = HttpPersistenceManager;
+
+//# sourceMappingURL=http-persistence-manager.js.map

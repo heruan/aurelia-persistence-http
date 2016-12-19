@@ -1,8 +1,0 @@
-{
-  "name": "aurelia-persistence-http",
-  "main": "dist/index.d.ts",
-  "dependencies": {},
-  "globalDependencies": {
-    "url-template": "registry:dt/url-template#2.0.6+20160317120654"
-  }
-}

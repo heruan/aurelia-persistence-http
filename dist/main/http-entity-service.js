@@ -60,3 +60,5 @@ HttpEntityService = __decorate([
     __metadata("design:paramtypes", [http_persistence_manager_1.HttpPersistenceManager, Function])
 ], HttpEntityService);
 exports.HttpEntityService = HttpEntityService;
+
+//# sourceMappingURL=http-entity-service.js.map
