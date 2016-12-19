@@ -18,7 +18,7 @@ var UrlTemplate = require("url-template");
 aurelia_http_client_1.RequestBuilder.addHelper("asCount", function () { return function (client, processor, message) {
     message.method = 'COUNT';
 }; });
-var HttpPersistenceManager = (function () {
+var HttpPersistenceManager = HttpPersistenceManager_1 = (function () {
     function HttpPersistenceManager(httpClient, typeBinder) {
         this.filterHeaderName = "X-Filter";
         this.limitHeaderName = "X-Limit";
@@ -28,16 +28,15 @@ var HttpPersistenceManager = (function () {
         this.countTotalHeaderName = "X-Count-Total";
         this.countFilterHeaderName = "X-Count-Filter";
         this.propertyFilterSeparator = ",";
-        this.collectionRelation = "collection";
-        this.entityRelation = "entity";
         this.httpClient = httpClient;
         this.typeBinder = typeBinder;
         this.locators = new Map();
     }
-    HttpPersistenceManager.prototype.addEntityType = function (type, collectionUri, entityUri) {
+    HttpPersistenceManager.prototype.addEntityType = function (type, baseUri, collectionPath, entityPath) {
         var locators = new Map();
-        locators.set(this.collectionRelation, collectionUri);
-        locators.set(this.entityRelation, entityUri);
+        locators.set(HttpPersistenceManager_1.BASE_URI, baseUri);
+        locators.set(HttpPersistenceManager_1.COLLECTION_RELATION, baseUri + collectionPath);
+        locators.set(HttpPersistenceManager_1.ENTITY_RELATION, baseUri + entityPath);
         this.locators.set(type, locators);
         return Promise.resolve();
     };
@@ -47,7 +46,7 @@ var HttpPersistenceManager = (function () {
         if (limit === void 0) { limit = 0; }
         if (skip === void 0) { skip = 0; }
         if (sorting === void 0) { sorting = new aurelia_persistence_1.Sorting(); }
-        if (relation === void 0) { relation = this.collectionRelation; }
+        if (relation === void 0) { relation = HttpPersistenceManager_1.COLLECTION_RELATION; }
         var url = this.link(type, relation, relationParams);
         var requestBuilder = this.httpClient.createRequest(url).asGet();
         requestBuilder.withHeader(this.filterHeaderName, JSON.stringify(query))
@@ -66,7 +65,7 @@ var HttpPersistenceManager = (function () {
         if (query === void 0) { query = new aurelia_persistence_1.FilterQuery(); }
         if (skip === void 0) { skip = 0; }
         if (sorting === void 0) { sorting = new aurelia_persistence_1.Sorting(); }
-        if (relation === void 0) { relation = this.collectionRelation; }
+        if (relation === void 0) { relation = HttpPersistenceManager_1.COLLECTION_RELATION; }
         var entities = this.findAll(type, query, 1, skip, sorting, properties, relation, relationParams);
         var promise = entities.then(function (entities) {
             if (entities.length > 0) {
@@ -82,7 +81,7 @@ var HttpPersistenceManager = (function () {
         if (query === void 0) { query = new aurelia_persistence_1.FilterQuery(); }
         if (limit === void 0) { limit = 0; }
         if (skip === void 0) { skip = 0; }
-        if (relation === void 0) { relation = this.collectionRelation; }
+        if (relation === void 0) { relation = HttpPersistenceManager_1.COLLECTION_RELATION; }
         if (relationParams === void 0) { relationParams = {}; }
         var url = this.link(type, relation, relationParams);
         return this.httpCount(url, query, limit, skip);
@@ -102,7 +101,7 @@ var HttpPersistenceManager = (function () {
         return promise;
     };
     HttpPersistenceManager.prototype.get = function (type, params, properties, relation) {
-        if (relation === void 0) { relation = this.entityRelation; }
+        if (relation === void 0) { relation = HttpPersistenceManager_1.ENTITY_RELATION; }
         var url = this.link(type, relation, params);
         return this.httpGet(url, properties, type);
     };
@@ -127,7 +126,7 @@ var HttpPersistenceManager = (function () {
         if (this.typeBinder.isBound(type, entity)) {
             var patch = aurelia_json_1.JsonPatch.diff(entity);
             if (patch.length > 0) {
-                var url_1 = this.link(type, relation || this.entityRelation, relationParams || entity);
+                var url_1 = this.link(type, relation || HttpPersistenceManager_1.ENTITY_RELATION, relationParams || entity);
                 promise = this.httpClient.createRequest(url_1)
                     .asPatch()
                     .withContent(patch)
@@ -142,7 +141,7 @@ var HttpPersistenceManager = (function () {
             }
         }
         else {
-            var url = this.link(type, relation || this.collectionRelation, relationParams || entity);
+            var url = this.link(type, relation || HttpPersistenceManager_1.COLLECTION_RELATION, relationParams || entity);
             promise = this.httpClient.createRequest(url)
                 .asPost()
                 .withContent(entity)
@@ -154,7 +153,7 @@ var HttpPersistenceManager = (function () {
         return promise;
     };
     HttpPersistenceManager.prototype.delete = function (type, entity, relation, relationParams) {
-        if (relation === void 0) { relation = this.entityRelation; }
+        if (relation === void 0) { relation = HttpPersistenceManager_1.ENTITY_RELATION; }
         var url = this.link(type, relation, relationParams || entity);
         var request = this.httpClient.createRequest(url).asDelete().send();
         var promise = request.then(function (success) { return null; });
@@ -166,10 +165,14 @@ var HttpPersistenceManager = (function () {
     };
     return HttpPersistenceManager;
 }());
-HttpPersistenceManager = __decorate([
+HttpPersistenceManager.BASE_URI = "base";
+HttpPersistenceManager.ENTITY_RELATION = "entity";
+HttpPersistenceManager.COLLECTION_RELATION = "list";
+HttpPersistenceManager = HttpPersistenceManager_1 = __decorate([
     aurelia_dependency_injection_1.autoinject,
     __metadata("design:paramtypes", [aurelia_http_client_1.HttpClient, type_binder_1.TypeBinder])
 ], HttpPersistenceManager);
 exports.HttpPersistenceManager = HttpPersistenceManager;
+var HttpPersistenceManager_1;
 
 //# sourceMappingURL=http-persistence-manager.js.map

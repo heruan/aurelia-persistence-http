@@ -3,6 +3,9 @@ import { HttpClient } from "aurelia-http-client";
 import { CancelablePromise } from "aurelia-utils";
 import { TypeBinder } from "type-binder";
 export declare class HttpPersistenceManager implements PersistenceManager {
+    static BASE_URI: string;
+    static ENTITY_RELATION: string;
+    static COLLECTION_RELATION: string;
     httpClient: HttpClient;
     typeBinder: TypeBinder;
     locators: Map<new () => Object, Map<string, string>>;
@@ -14,10 +17,8 @@ export declare class HttpPersistenceManager implements PersistenceManager {
     countTotalHeaderName: string;
     countFilterHeaderName: string;
     propertyFilterSeparator: string;
-    private collectionRelation;
-    private entityRelation;
     constructor(httpClient: HttpClient, typeBinder: TypeBinder);
-    addEntityType<E extends Object>(type: new () => E, collectionUri: string, entityUri: string): Promise<void>;
+    addEntityType<E extends Object>(type: new () => E, baseUri: string, collectionPath: string, entityPath: string): Promise<void>;
     findAll<E extends Object>(type: new () => E, query?: Query, limit?: number, skip?: number, sorting?: Sorting, properties?: string[], relation?: string, relationParams?: Object): CancelablePromise<E[]>;
     findOne<E extends Object>(type: new () => E, query?: Query, skip?: number, sorting?: Sorting, properties?: string[], relation?: string, relationParams?: Object): CancelablePromise<E>;
     count<E extends Object>(type: new () => E, query?: Query, limit?: number, skip?: number, relation?: string, relationParams?: Object): CancelablePromise<number>;

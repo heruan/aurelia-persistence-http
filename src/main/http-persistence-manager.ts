@@ -14,6 +14,12 @@ RequestBuilder.addHelper("asCount", () => (client, processor, message) => {
 @autoinject
 export class HttpPersistenceManager implements PersistenceManager {
 
+    public static BASE_URI: string = "base";
+
+    public static ENTITY_RELATION: string = "entity";
+
+    public static COLLECTION_RELATION: string = "list";
+
     public httpClient: HttpClient;
 
     public typeBinder: TypeBinder;
@@ -36,20 +42,17 @@ export class HttpPersistenceManager implements PersistenceManager {
 
     public propertyFilterSeparator: string = ",";
 
-    private collectionRelation: string = "collection";
-
-    private entityRelation: string = "entity";
-
     public constructor(httpClient: HttpClient, typeBinder: TypeBinder) {
         this.httpClient = httpClient;
         this.typeBinder = typeBinder;
         this.locators = new Map<new() => Object, Map<string, string>>();
     }
 
-    public addEntityType<E extends Object>(type: new() => E, collectionUri: string, entityUri: string): Promise<void> {
+    public addEntityType<E extends Object>(type: new() => E, baseUri: string, collectionPath: string, entityPath: string): Promise<void> {
         let locators = new Map<string, string>();
-        locators.set(this.collectionRelation, collectionUri);
-        locators.set(this.entityRelation, entityUri);
+        locators.set(HttpPersistenceManager.BASE_URI, baseUri);
+        locators.set(HttpPersistenceManager.COLLECTION_RELATION, baseUri + collectionPath);
+        locators.set(HttpPersistenceManager.ENTITY_RELATION, baseUri + entityPath);
         this.locators.set(type, locators);
         return Promise.resolve();
     }
@@ -61,7 +64,7 @@ export class HttpPersistenceManager implements PersistenceManager {
             skip: number = 0,
             sorting: Sorting = new Sorting(),
             properties?: string[],
-            relation: string = this.collectionRelation,
+            relation: string = HttpPersistenceManager.COLLECTION_RELATION,
             relationParams?: Object): CancelablePromise<E[]> {
         let url = this.link(type, relation, relationParams);
         let requestBuilder = this.httpClient.createRequest(url).asGet();
@@ -84,7 +87,7 @@ export class HttpPersistenceManager implements PersistenceManager {
             skip: number = 0,
             sorting: Sorting = new Sorting(),
             properties?: string[],
-            relation: string = this.collectionRelation,
+            relation: string = HttpPersistenceManager.COLLECTION_RELATION,
             relationParams?: Object): CancelablePromise<E> {
         let entities = <CancelablePromise<E[]>> this.findAll(type, query, 1, skip, sorting, properties, relation, relationParams);
         let promise = <CancelablePromise<E>> entities.then(entities => {
@@ -101,7 +104,7 @@ export class HttpPersistenceManager implements PersistenceManager {
             query: Query = new FilterQuery(),
             limit: number = 0,
             skip: number = 0,
-            relation: string = this.collectionRelation,
+            relation: string = HttpPersistenceManager.COLLECTION_RELATION,
             relationParams: Object = { }): CancelablePromise<number> {
         let url = this.link(type, relation, relationParams);
         return this.httpCount(url, query, limit, skip);
@@ -123,7 +126,7 @@ export class HttpPersistenceManager implements PersistenceManager {
             type: new() => E,
             params: Object,
             properties?: string[],
-            relation: string = this.entityRelation): CancelablePromise<E> {
+            relation: string = HttpPersistenceManager.ENTITY_RELATION): CancelablePromise<E> {
         let url = this.link(type, relation, params);
         return this.httpGet(url, properties, type);
     }
@@ -148,7 +151,7 @@ export class HttpPersistenceManager implements PersistenceManager {
         if (this.typeBinder.isBound(type, entity)) {
             let patch = JsonPatch.diff(entity);
             if (patch.length > 0) {
-                let url = this.link(type, relation || this.entityRelation, relationParams || entity);
+                let url = this.link(type, relation || HttpPersistenceManager.ENTITY_RELATION, relationParams || entity);
                 promise = <CancelablePromise<E>> this.httpClient.createRequest(url)
                     .asPatch()
                     .withContent(patch)
@@ -161,7 +164,7 @@ export class HttpPersistenceManager implements PersistenceManager {
                 promise.cancel = () => { };
             }
         } else {
-            let url = this.link(type, relation || this.collectionRelation, relationParams || entity);
+            let url = this.link(type, relation || HttpPersistenceManager.COLLECTION_RELATION, relationParams || entity);
             promise = <CancelablePromise<E>> this.httpClient.createRequest(url)
                 .asPost()
                 .withContent(entity)
@@ -176,7 +179,7 @@ export class HttpPersistenceManager implements PersistenceManager {
     public delete<E extends Object>(
             type: new() => E,
             entity: E,
-            relation: string = this.entityRelation,
+            relation: string = HttpPersistenceManager.ENTITY_RELATION,
             relationParams?: Object): CancelablePromise<void> {
         let url = this.link(type, relation, relationParams || entity);
         let request = <CancelablePromise<HttpResponseMessage>> this.httpClient.createRequest(url).asDelete().send();
