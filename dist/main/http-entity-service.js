@@ -41,11 +41,11 @@ var HttpEntityService = (function () {
     HttpEntityService.prototype.get = function (params, properties) {
         return this.persistenceManager.get(this.getEntityType(), params, properties);
     };
-    HttpEntityService.prototype.save = function (entity) {
-        return this.persistenceManager.save(this.getEntityType(), entity);
+    HttpEntityService.prototype.save = function (entity, properties) {
+        return this.persistenceManager.save(this.getEntityType(), entity, properties);
     };
     HttpEntityService.prototype.delete = function (entity) {
-        return this.persistenceManager.delete(this.getEntityType(), entity);
+        return this.persistenceManager.delete(this.getEntityType(), entity, http_persistence_manager_1.HttpPersistenceManager.ENTITY_RELATION, this.getParamsFromEntity(entity));
     };
     HttpEntityService.prototype.getParamsFromEntity = function (entity) {
         return entity;

@@ -137,7 +137,7 @@ export class HttpPersistenceManager implements PersistenceManager {
             requestBuilder.withHeader(this.propertyFilterHeaderName, properties.join(","));
         }
         let request = <CancelablePromise<HttpResponseMessage>> requestBuilder.send();
-        let promise = <CancelablePromise<T>> request.then(success => this.typeBinder.bind(success.content, type));
+        let promise = <CancelablePromise<T>> request.then(success => this.typeBinder.bind(success.content, type, ...generics));
         promise.cancel = request.cancel;
         return promise;
     }
@@ -145,11 +145,14 @@ export class HttpPersistenceManager implements PersistenceManager {
     public save<E extends Object>(
             type: new() => E,
             entity: E,
+            properties?: string[],
             relation?: string,
-            relationParams?: Object): CancelablePromise<E> {
+            relationParams?: Object,
+            preferPut: boolean = false): CancelablePromise<E> {
         let promise: CancelablePromise<E>;
         if (this.typeBinder.isBound(type, entity)) {
-            let patch = JsonPatch.diff(entity);
+            let patch = JsonPatch.diff(entity, properties);
+            console.log(patch);
             if (patch.length > 0) {
                 let url = this.link(type, relation || HttpPersistenceManager.ENTITY_RELATION, relationParams || entity);
                 promise = <CancelablePromise<E>> this.httpClient.createRequest(url)
@@ -157,12 +160,19 @@ export class HttpPersistenceManager implements PersistenceManager {
                     .withContent(patch)
                     .withInterceptor(new JsonMultipartRelatedInterceptor(ContentType.APPLICATION_JSON_PATCH))
                     .send()
-                    .then(success => this.httpClient.get(url))
-                    .then(success => this.typeBinder.bind(success.content, type));
+                    .then(success => this.httpGet(url, properties, type));
             } else {
                 promise = <CancelablePromise<E>> Promise.resolve(entity);
                 promise.cancel = () => { };
             }
+        } else if (preferPut) {
+            let url = this.link(type, relation || HttpPersistenceManager.ENTITY_RELATION, relationParams || entity);
+            promise = <CancelablePromise<E>> this.httpClient.createRequest(url)
+                .asPut()
+                .withContent(entity)
+                .withInterceptor(new JsonMultipartRelatedInterceptor(ContentType.APPLICATION_JSON))
+                .send()
+                .then(success => this.httpGet(url, properties, type));
         } else {
             let url = this.link(type, relation || HttpPersistenceManager.COLLECTION_RELATION, relationParams || entity);
             promise = <CancelablePromise<E>> this.httpClient.createRequest(url)
@@ -170,8 +180,7 @@ export class HttpPersistenceManager implements PersistenceManager {
                 .withContent(entity)
                 .withInterceptor(new JsonMultipartRelatedInterceptor(ContentType.APPLICATION_JSON))
                 .send()
-                .then(success => this.httpClient.get(HttpHeaders.LOCATION))
-                .then(success => this.typeBinder.bind(success.content, type));
+                .then(success => this.httpGet(success.headers.get(HttpHeaders.LOCATION), properties, type));
         }
         return promise;
     }

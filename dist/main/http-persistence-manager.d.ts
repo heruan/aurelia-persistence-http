@@ -25,7 +25,7 @@ export declare class HttpPersistenceManager implements PersistenceManager {
     httpCount(url: string, query?: Query, limit?: number, skip?: number): CancelablePromise<number>;
     get<E extends Object>(type: new () => E, params: Object, properties?: string[], relation?: string): CancelablePromise<E>;
     httpGet<T>(url: string, properties: string[], type: new () => T, ...generics: any[]): CancelablePromise<T>;
-    save<E extends Object>(type: new () => E, entity: E, relation?: string, relationParams?: Object): CancelablePromise<E>;
+    save<E extends Object>(type: new () => E, entity: E, properties?: string[], relation?: string, relationParams?: Object, preferPut?: boolean): CancelablePromise<E>;
     delete<E extends Object>(type: new () => E, entity: E, relation?: string, relationParams?: Object): CancelablePromise<void>;
     link<E extends Object>(type: new () => E, relation: string, params?: Object): string;
 }

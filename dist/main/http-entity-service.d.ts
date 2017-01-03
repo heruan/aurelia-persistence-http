@@ -12,7 +12,7 @@ export declare abstract class HttpEntityService<E extends Object> implements Ent
     findOne(query?: Query, skip?: number, sorting?: Sorting, properties?: string[]): CancelablePromise<E>;
     count(query?: Query, limit?: number, skip?: number): CancelablePromise<number>;
     get(params: Object, properties?: string[]): CancelablePromise<E>;
-    save<D>(entity: E): CancelablePromise<E>;
+    save<D>(entity: E, properties?: string[]): CancelablePromise<E>;
     delete(entity: E): CancelablePromise<void>;
     protected getParamsFromEntity(entity: E): Object;
     protected getEntityType(): new () => E;

@@ -116,15 +116,20 @@ var HttpPersistenceManager = HttpPersistenceManager_1 = (function () {
             requestBuilder.withHeader(this.propertyFilterHeaderName, properties.join(","));
         }
         var request = requestBuilder.send();
-        var promise = request.then(function (success) { return _this.typeBinder.bind(success.content, type); });
+        var promise = request.then(function (success) {
+            return (_a = _this.typeBinder).bind.apply(_a, [success.content, type].concat(generics));
+            var _a;
+        });
         promise.cancel = request.cancel;
         return promise;
     };
-    HttpPersistenceManager.prototype.save = function (type, entity, relation, relationParams) {
+    HttpPersistenceManager.prototype.save = function (type, entity, properties, relation, relationParams, preferPut) {
         var _this = this;
+        if (preferPut === void 0) { preferPut = false; }
         var promise;
         if (this.typeBinder.isBound(type, entity)) {
-            var patch = aurelia_json_1.JsonPatch.diff(entity);
+            var patch = aurelia_json_1.JsonPatch.diff(entity, properties);
+            console.log(patch);
             if (patch.length > 0) {
                 var url_1 = this.link(type, relation || HttpPersistenceManager_1.ENTITY_RELATION, relationParams || entity);
                 promise = this.httpClient.createRequest(url_1)
@@ -132,13 +137,21 @@ var HttpPersistenceManager = HttpPersistenceManager_1 = (function () {
                     .withContent(patch)
                     .withInterceptor(new aurelia_json_1.JsonMultipartRelatedInterceptor(aurelia_http_utils_1.ContentType.APPLICATION_JSON_PATCH))
                     .send()
-                    .then(function (success) { return _this.httpClient.get(url_1); })
-                    .then(function (success) { return _this.typeBinder.bind(success.content, type); });
+                    .then(function (success) { return _this.httpGet(url_1, properties, type); });
             }
             else {
                 promise = Promise.resolve(entity);
                 promise.cancel = function () { };
             }
+        }
+        else if (preferPut) {
+            var url_2 = this.link(type, relation || HttpPersistenceManager_1.ENTITY_RELATION, relationParams || entity);
+            promise = this.httpClient.createRequest(url_2)
+                .asPut()
+                .withContent(entity)
+                .withInterceptor(new aurelia_json_1.JsonMultipartRelatedInterceptor(aurelia_http_utils_1.ContentType.APPLICATION_JSON))
+                .send()
+                .then(function (success) { return _this.httpGet(url_2, properties, type); });
         }
         else {
             var url = this.link(type, relation || HttpPersistenceManager_1.COLLECTION_RELATION, relationParams || entity);
@@ -147,8 +160,7 @@ var HttpPersistenceManager = HttpPersistenceManager_1 = (function () {
                 .withContent(entity)
                 .withInterceptor(new aurelia_json_1.JsonMultipartRelatedInterceptor(aurelia_http_utils_1.ContentType.APPLICATION_JSON))
                 .send()
-                .then(function (success) { return _this.httpClient.get(aurelia_http_utils_1.HttpHeaders.LOCATION); })
-                .then(function (success) { return _this.typeBinder.bind(success.content, type); });
+                .then(function (success) { return _this.httpGet(success.headers.get(aurelia_http_utils_1.HttpHeaders.LOCATION), properties, type); });
         }
         return promise;
     };
