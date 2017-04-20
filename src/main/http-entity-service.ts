@@ -37,7 +37,7 @@ export abstract class HttpEntityService<E extends Object> implements EntityServi
         return this.persistenceManager.get<E>(this.getEntityType(), params, properties);
     }
 
-    public save<D>(entity: E, properties?: string[]): CancelablePromise<E> {
+    public save(entity: E, properties?: string[]): CancelablePromise<E> {
         return this.persistenceManager.save<E>(this.getEntityType(), entity, properties);
     }
 
